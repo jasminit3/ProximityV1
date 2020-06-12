@@ -11,11 +11,12 @@ import android.os.Message
 import android.util.*
 import com.estimote.coresdk.common.internal.utils.L
 import com.estimote.mustard.rx_goodness.rx_requirements_wizard.RequirementsWizardFactory
+import com.estimote.proximity_sdk.api.ProximityZoneContext
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    private var observationsHandler: ProximityObserver.Handler?=null
+    private var observationsHandler: ProximityObserver.Handler? = null
     private val logTags = MainActivity::class.simpleName
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +38,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 .build()
 
-
+        val itemKey = "CPR"
         //3. Definerer Proximity zone
         val venueZone = ProximityZoneBuilder()
             .forTag("Jasmin")
@@ -56,15 +57,23 @@ class MainActivity : AppCompatActivity() {
              Log.i(logTags, title + "" + description)*/
             }
             .onContextChange { contexts ->
-                Log.i(logTags, "onContextChange" + contexts)
-                /*val nearbyContent = ArrayList<ProximityZoneContext>(contexts.size)  //ProximityZoneContext-arraylist indeholder contexts, som indeholder data tilhørende beaconen; attachments, deviceId, tag
-            for (context in contexts) {
-                val title: String = context.attachments["CPR"] ?: "0123456789"
-                nearbyContent.add(ProximityZoneContext(title))
+                for (context in contexts) {
+                    val title: String = context.attachments[itemKey] ?: "kukuk"
+
+                    Log.i(logTags, "Oplysninger: " + itemKey + " " + title)
                 }
-            }*/
             }
             .build()
+        //Ians metode:
+        /*contexts ->
+               val tilstandsændring = contexts.map { context ->
+                   context.attachments[itemKey]
+               }
+
+               val nonNullPersons = tilstandsændring.filterNotNull() //fjerner null objekter fra arrayet
+
+               if (nonNullPersons.isNotEmpty())
+               }*/
 
 
         //4. Lokationstilladelse + Starter Proximity observering
@@ -73,7 +82,8 @@ class MainActivity : AppCompatActivity() {
             .fulfillRequirements(this,
                 {
                     Log.i("app", "Krav opfyldt")
-                    val observationsHandler = proximityObserver.startObserving(venueZone) // onRequirementsFulfilled
+                    val observationsHandler =
+                        proximityObserver.startObserving(venueZone) // onRequirementsFulfilled
                 },
                 { requirements ->
                     Log.e(
@@ -87,10 +97,10 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-        //6. Stopper scanning
-        override fun onDestroy() {
-            observationsHandler?.stop()
-            super.onDestroy()
+    //6. Stopper scanning
+    override fun onDestroy() {
+        observationsHandler?.stop()
+        super.onDestroy()
 
     }
 
