@@ -38,8 +38,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 .build()
 
-        val itemKey = "CPR"
+
         //3. Definerer Proximity zone
+        val itemKey = "CPR"
+
         val venueZone = ProximityZoneBuilder()
             .forTag("Jasmin")
             .inNearRange()
@@ -60,7 +62,11 @@ class MainActivity : AppCompatActivity() {
                 for (context in contexts) {
                     val title: String = context.attachments[itemKey] ?: "kukuk"
 
-                    Log.i(logTags, "Oplysninger: " + itemKey + " " + title)
+                    val notNullPersons = contexts.filterNotNull()
+                    if (notNullPersons.isNotEmpty()) {
+                        Log.i(logTags, "Oplysninger: " + itemKey + " " + title)
+                    }
+
                 }
             }
             .build()
